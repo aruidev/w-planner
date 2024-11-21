@@ -4,7 +4,7 @@ WebPlanner is a user-friendly application that allows you to create events or ta
 You can place your tasks directly into a customizable schedule and, once your planning is complete, save an image of your final timetable.
 
 #### Getting Started:
-To get started, just follow this [link](https://arucadev.github.io/WebPlanner/).
+https://arucadev.github.io/WebPlanner/
 
 #### Features:
 - Drag-and-drop functionality to easily organize events or tasks.
