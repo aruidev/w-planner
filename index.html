@@ -27,6 +27,7 @@
             transform-origin: top;
             width: 100%;
             box-sizing: border-box;
+            overflow-y: hidden;
         }
 
         header {
@@ -214,6 +215,11 @@
             justify-content: center;
             a {
                 color: var(--highlight-color);
+            }
+        }
+        @media (max-height: 1050px) {
+            body {
+                overflow-y: auto;
             }
         }
     </style>
