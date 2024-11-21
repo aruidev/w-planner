@@ -23,6 +23,9 @@
             max-width: max-content;
             padding-inline: 32px;
             color: var(--text-color);
+            transform: scale(0.8);
+            transform-origin: top;
+            width: 100%;
             box-sizing: border-box;
         }
 
@@ -138,11 +141,11 @@
                     border-radius: 6px;
                     padding: 8px;
                     border: none;
-                    background-color: #ffffff18;
+                    background-color: var(--sec-color);
                     color: #c2c2c2;
                 };
                 & input:hover {
-                    background-color: #ffffff2e;
+                    background-color: var(--sec-color);
                     transition: background-color 0.3s ease;
                     box-shadow: 0 0 0 2px var(--highlight-color);
                 };
@@ -165,7 +168,7 @@
                 align-items: flex-start;
                 gap: 8px;
                 user-select: none;
-                background-color: #2e2e35;
+                background-color: var(--table-bg-color);
                 min-height: 100px;
                 width: 100%;
                 padding: 12px;
@@ -570,15 +573,17 @@
         const rows = document.querySelectorAll('tr');
         const deleteRowButtons = document.querySelectorAll('.delete-row');
 
-        // Iterate over the rows and add a click event listener to each delete button
         deleteRowButtons.forEach(button => {
             button.addEventListener('click', deleteRow);
         });
 
         function deleteRow(event) {
-            const row = event.target.parentElement; // Select the parent tr element
-            row.remove(); // Remove the row from the table
+            const row = event.target.parentElement; 
+            const table = row.parentElement; 
+
+            row.remove(); 
         }
+
 
         function addEvent() {
             const eventName = eventInput.value.trim();
@@ -645,14 +650,7 @@
         resetButton.addEventListener("click", resetTable)
         
         function resetTable() {
-            const tableCells = document.querySelectorAll('td');
-
-            tableCells.forEach(cell => {
-                // Si la celda NO tiene la clase específica, vaciar el contenido
-                if (!cell.classList.contains('time') && !cell.classList.contains('delete-row')) {
-                    cell.innerHTML = '';
-                }
-            });
+            location.reload();
         }
 
         const snapshotButton = document.getElementById("snapshot")
