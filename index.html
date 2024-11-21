@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#WebPlanner</title>
+    <style>
+        :root {
+            --bg-color: #222227;
+            --sec-color: #f0f8ff27;
+            --table-bg-color: #2e2e35;
+            --text-color: #c2c2c2;
+            --highlight-color: #aeadfc83;
+            --border-color: #ffffff18;
+            --hover-color: #ffffff48;
+            --delete-color: #be101023;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0 auto;
+            max-width: max-content;
+            padding-inline: 32px;
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        header {
+            #logo {
+            display: flex;
+            justify-content: center;
+            padding: 3px;
+            user-select: none;
+            };
+        }
+        
+        table {
+            overflow-x: scroll;
+            background-color: var(--bg-color);
+            & td, th{
+                background-color: var(--table-bg-color);
+                height: 2rem;
+                border-radius: 4px;
+                user-select: none;
+                margin-inline: 10px;
+                padding-inline: 20px;
+                white-space: nowrap;
+            }
+            & th {
+                text-align: center;
+                padding: 0 1rem;
+                width: 100px;
+                background-color: var(--sec-color);
+            }
+            & .time {
+                padding-inline: 20px;
+            }
+            & .empty {
+            visibility: hidden;
+            }
+            & .time {
+            background-color: var(--sec-color);
+            text-align: center;
+            }
+            & .delete-row {
+            border-radius: 50%;
+            text-align: center;
+            padding-inline: 0;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background-color: var(--bg-color);
+            }
+            &.delete-row:hover {
+            opacity: 1;
+            color: red;
+            background-color: var(--table-bg-color);
+            transition: 0.5s ease;
+            }
+            & .dragover {
+            background-color: var(--hover-color);
+            }
+            & .dragover + .time {
+                background-color: var(--hover-color);
+            }
+            & .delete-row:hover {
+            opacity: 1;
+            color: red;
+            background-color: var(--table-bg-color);
+            transition: 0.5s ease;
+            }
+            & tr:hover .delete-row {
+           opacity: 1;
+            }
+            & tr:hover .time {
+            background-color: #aeadfc83;
+            }
+        }
+
+        
+        #buttons-container {
+            display: flex;
+            justify-content: center;
+            padding-top: 10px;
+            gap: 20px;
+            button {
+                    border-radius: 6px;
+                    color: white;
+                    padding: 8px;
+                    border: none;
+                    background-color: var(--highlight-color);
+                    cursor: pointer;
+                    height: 37px;
+                    &:hover {
+                        transition: 0.1s ease;
+                        scale: 1.05;
+                    }
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+            }
+            #reset {
+                background-color: var(--delete-color);
+            }
+        }
+        
+        section {
+            & #create-event-container {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                margin: 10px;
+                gap: 5px;
+                user-select: none;
+                & input {
+                    border-radius: 6px;
+                    padding: 8px;
+                    border: none;
+                    background-color: #ffffff18;
+                    color: #c2c2c2;
+                };
+                & input:hover {
+                    background-color: #ffffff2e;
+                    transition: background-color 0.3s ease;
+                    box-shadow: 0 0 0 2px var(--highlight-color);
+                };
+                & button {
+                    border-radius: 6px;
+                    color: white;
+                    padding: 8px;
+                    border: none;
+                    background-color: var(--highlight-color);
+                    cursor: pointer;
+                    &:hover {
+                        transition: 0.1s ease;
+                        scale: 1.05;
+                    }
+                };
+            }
+            & #event-cards-container {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 8px;
+                user-select: none;
+                background-color: #2e2e35;
+                min-height: 100px;
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+            }
+        }
+
+        .event-card-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: center;
+            justify-content: space-between;
+            gap: 8px;
+            background-color: white;
+            padding-inline: 6px;
+            border-radius: 8px;
+            height: 2rem;
+            column-width: auto;
+            color: black;
+            overflow: hidden;
+            cursor: grabbing;
+            & .delete-event {
+                color: #c2c2c2;
+            }
+        }
+
+        .delete-event {
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 50%;
+                opacity: 0.8;
+                transition: opacity 0.5s ease;
+                user-select: none;
+                &:hover {
+                    opacity: 1;
+                    color: red;
+                }
+            }
+        
+        footer {
+            display: flex;
+            justify-content: center;
+            a {
+                color: var(--highlight-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="logo">#WebPlanner</h1>
+    </header>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <td class="empty"></td>
+                    <td class="empty"></td>
+                    <th>Sunday</t>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</t>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="row0">
+                    <td class="delete-row">X</td>
+                    <td class="time">00:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row1">
+                    <td class="delete-row">X</td>
+                    <td class="time">01:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row2">
+                    <td class="delete-row">X</td>
+                    <td class="time">02:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row3">
+                    <td class="delete-row">X</td>
+                    <td class="time">03:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row4">
+                    <td class="delete-row">X</td>
+                    <td class="time">04:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row5">
+                    <td class="delete-row">X</td>
+                    <td class="time">05:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row6">
+                    <td class="delete-row">X</td>
+                    <td class="time">06:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row7">
+                    <td class="delete-row">X</td>
+                    <td class="time">07:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row8">
+                    <td class="delete-row">X</td>
+                    <td class="time">08:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row9">
+                    <td class="delete-row">X</td>
+                    <td class="time">09:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row10">
+                    <td class="delete-row">X</td>
+                    <td class="time">10:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row11">
+                    <td class="delete-row">X</td>
+                    <td class="time">11:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row12">
+                    <td class="delete-row">X</td>
+                    <td class="time">12:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row13">
+                    <td class="delete-row">X</td>
+                    <td class="time">13:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row14">
+                    <td class="delete-row">X</td>
+                    <td class="time">14:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row15">
+                    <td class="delete-row">X</td>
+                    <td class="time">15:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row16">
+                    <td class="delete-row">X</td>
+                    <td class="time">16:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row17">
+                    <td class="delete-row">X</td>
+                    <td class="time">17:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row18">
+                    <td class="delete-row">X</td>
+                    <td class="time">18:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row19">
+                    <td class="delete-row">X</td>
+                    <td class="time">19:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row20">
+                    <td class="delete-row">X</td>
+                    <td class="time">20:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row21">
+                    <td class="delete-row">X</td>
+                    <td class="time">21:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row22">
+                    <td class="delete-row">X</td>
+                    <td class="time">22:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="row23">
+                    <td class="delete-row">X</td>
+                    <td class="time">23:00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="buttons-container">
+            <button id="reset" title="Reset ALL">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    >
+                    <path
+                        d="M19.95 11a8 8 0 1 0 -.5 4m.5 5v-5h-5"
+                        transform="rotate(170 12 12)"
+                    />
+                </svg>
+            </button>
+            <button id="snapshot" title="Save PNG">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M12 20h-7a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3.5" />
+                    <path d="M16 19h6" />
+                    <path d="M19 16v6" />
+                    <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                </svg>
+            </button>
+        </div>
+
+        <section>
+            <div id="create-event-container">
+                <label for="create-event">New event</label>
+                <div><input type="text" id="create-event">
+                    <button id="add-event-button">Create</button>
+                </div>
+            </div>
+            <div id="event-cards-container"></div>
+        </section>
+    </main>
+    <footer><p>&copy; 2024 Project by <a href="arucadev.github.io">arucadev</a>↗</p></footer>
+    <script>
+        const eventInput = document.getElementById('create-event');
+        const addEventButton = document.getElementById('add-event-button');
+        const eventCardsContainer = document.getElementById('event-cards-container');
+        const cells = document.querySelectorAll('table td');
+
+        let draggedElement = null;
+
+        addEventButton.addEventListener('click', addEvent);
+        eventInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                addEvent();
+            }
+        });
+
+        const rows = document.querySelectorAll('tr');
+        const deleteRowButtons = document.querySelectorAll('.delete-row');
+
+        // Iterate over the rows and add a click event listener to each delete button
+        deleteRowButtons.forEach(button => {
+            button.addEventListener('click', deleteRow);
+        });
+
+        function deleteRow(event) {
+            const row = event.target.parentElement; // Select the parent tr element
+            row.remove(); // Remove the row from the table
+        }
+
+        function addEvent() {
+            const eventName = eventInput.value.trim();
+            if (!eventName) {
+                alert('Please enter an event name');
+                return;
+            }
+
+            const newCard = document.createElement('div');
+            newCard.classList.add('event-card-content');
+            newCard.setAttribute('draggable', 'true');
+            newCard.innerHTML = `
+                <p><b>${eventName}</b></p>
+                <span class="delete-event">X</span>
+            `;
+
+            const deleteButton = newCard.querySelector('.delete-event');
+            deleteButton.addEventListener('click', () => newCard.remove());
+
+            newCard.addEventListener('dragstart', handleDragStart);
+            newCard.addEventListener('dragend', handleDragEnd);
+
+            eventCardsContainer.appendChild(newCard);
+            eventInput.value = '';
+        }
+
+        function handleDragStart(event) {
+            draggedElement = event.target;
+            setTimeout(() => draggedElement.classList.add('hidden'), 0);
+        }
+
+        function handleDragEnd() {
+            draggedElement.classList.remove('hidden');
+            draggedElement = null;
+        }
+
+        cells.forEach(cell => {
+            cell.addEventListener('dragover', (event) => {
+                event.preventDefault(); 
+                cell.classList.add('dragover'); 
+            });
+            cell.addEventListener('dragleave', () => {
+                cell.classList.remove('dragover'); 
+            });
+            cell.addEventListener('drop', handleDrop);
+            cell.addEventListener('drop', () => cell.classList.remove('dragover'));
+        });
+
+                
+        function handleDrop(event) {
+            if (draggedElement && event.target && event.target.tagName === 'TD' && event.target.children.length === 0) {
+                const clone = draggedElement.cloneNode(true);
+                clone.addEventListener('dragstart', handleDragStart);
+                clone.addEventListener('dragend', handleDragEnd);
+
+                const deleteButton = clone.querySelector('.delete-event');
+                deleteButton.addEventListener('click', () => clone.remove());
+
+                event.target.appendChild(clone);
+            }
+        }
+
+        const resetButton = document.getElementById("reset")
+        resetButton.addEventListener("click", resetTable)
+        
+        function resetTable() {
+            const tableCells = document.querySelectorAll('td');
+
+            tableCells.forEach(cell => {
+                // Si la celda NO tiene la clase específica, vaciar el contenido
+                if (!cell.classList.contains('time') && !cell.classList.contains('delete-row')) {
+                    cell.innerHTML = '';
+                }
+            });
+        }
+
+        const snapshotButton = document.getElementById("snapshot")
+        snapshotButton.addEventListener("click", saveSnapshot)
+
+        function saveSnapshot() {
+            const table = document.querySelector("table");
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext('2d')
+
+            import('https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/+esm')
+                .then(({ default: html2canvas }) => {
+                    html2canvas(table).then(canvas => {
+                        ctx.drawImage(canvas, 0, 0);
+                        const imgURL = canvas.toDataURL("image/png");
+                        const downloadLink = document.createElement("a");
+                        downloadLink.download = "My_Schedule.png";
+                        downloadLink.href = imgURL;
+                        downloadLink.click()
+                    })
+                })
+        }
+
+    </script>
+</body>
+</html>
