@@ -17,9 +17,3 @@ https://arucadev.github.io/WebPlanner/
 - Event scheduling
 
 ### This project was created solely for learning purposes.
-
-It is a simple web application that explores fundamental concepts of HTML, CSS, and JavaScript.
-Please note that:
-- Saving images may not work on mobile devices.
-- The UI may behave strangely on some devices.
-- The code might not be optimal, and both styles and JavaScript are implemented inline.
