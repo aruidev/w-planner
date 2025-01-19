@@ -16,4 +16,8 @@ https://arucadev.github.io/w-planner/
 - Weekly planning
 - Event scheduling
 
+#### Please note:
+- For simplicity, the JavaScript and CSS code is embedded directly within the HTML file
+
 ### This project was created solely for learning purposes.
+
